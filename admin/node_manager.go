@@ -9,6 +9,7 @@ import (
 	"github.com/zyylhn/node-tree/admin/topology"
 	"github.com/zyylhn/node-tree/protocol"
 	"github.com/zyylhn/node-tree/public"
+	"io"
 	"net"
 )
 
@@ -197,4 +198,46 @@ func (n *NodeManager) handleMessFromDownstream() {
 			}
 		}
 	}
+}
+
+func (n *NodeManager) ConnectToNewAgent(node, addr, proxy, proxyUser, proxyPass string) (string, error) {
+	return n.Mgr.ConnectManager.ConnectToAgent(node, addr, proxy, proxyUser, proxyPass)
+}
+
+// CreateListener Creates a listener on the specified node. 'autoStop' is used to set whether to automatically pause when a node is received online, and 'addr' is the listening address on the specified node
+func (n *NodeManager) CreateListener(node string, autoStop bool, addr string) error {
+	return n.Mgr.ListenManager.NewListener(node, autoStop, addr)
+}
+
+// CreateWaitOnLineListener Unlike 'CreateListener', which creates a single listener, 'CreateWaitOnLineListener' creates the listener and waits for the node to go online, then automatically closes the listener and returns the node id that went online
+func (n *NodeManager) CreateWaitOnLineListener(ctx context.Context, node string, addr string) (string, error) {
+	return n.Mgr.ListenManager.NewListenerNode(ctx, node, addr)
+}
+
+func (n *NodeManager) GetListener(node string) ([]string, error) {
+	return n.Mgr.ListenManager.GetNodeListener(node)
+}
+
+// StopListener Stop the listeners at the specified address on the specified node and stop all listeners on the node when 'choice' is' all '
+func (n *NodeManager) StopListener(node string, choice string) error {
+	return n.Mgr.ListenManager.StopListener(node, choice)
+}
+
+// CreateRemoteLoad todo 去掉cancel，只传输ctx
+func (n *NodeManager) CreateRemoteLoad(module io.ReadCloser, args string, moduleName string, ctx *context.Context, c *context.CancelFunc) (*manager.RemoteLoad, error) {
+	return n.Mgr.RemoteLoadManager.NewRemoteLoad(module, args, moduleName, ctx, c)
+}
+
+// CreateBackward Create a reverse port forwarding. The agent listens to the specified rPort and forwards all requests to the rPort to lAddr
+func (n *NodeManager) CreateBackward(lAddr string, rPort string, node string) error {
+	return n.Mgr.BackwardManager.Create(lAddr, rPort, node)
+}
+
+// StopBackward To stop port forwarding on a specified port on a specified node, the choice is either 'all' or the selected rPort
+func (n *NodeManager) StopBackward(node string, choice string) error {
+	return n.Mgr.BackwardManager.StopWithChoice(node, choice)
+}
+
+func (n *NodeManager) GetBackWardInfo(node string) map[string]*manager.Backward {
+	return n.Mgr.BackwardManager.GetInfoSingleNode(node)
 }

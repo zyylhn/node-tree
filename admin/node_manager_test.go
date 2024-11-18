@@ -72,7 +72,7 @@ func TestAgentConnectAgent(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(admin.Mgr.ConnectManager.ConnectToAgent(admin.Topology.GetUUID(0), "127.0.0.1:7002", "", "", ""))
+	fmt.Println(admin.ConnectToNewAgent(admin.Topology.GetUUID(0), "127.0.0.1:7002", "", "", ""))
 
 	time.Sleep(3 * time.Second)
 	admin.CloseWithAllNode(false)
@@ -105,7 +105,7 @@ func TestAgentListenerReturnID(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(admin.Mgr.ListenManager.NewListenerNode(context.Background(), admin.Topology.GetUUID(0), listenerAddr))
+	fmt.Println(admin.CreateWaitOnLineListener(context.Background(), admin.Topology.GetUUID(0), listenerAddr))
 
 	time.Sleep(3 * time.Second)
 	admin.CloseWithAllNode(false)
@@ -139,17 +139,17 @@ func TestAgentListener(t *testing.T) {
 	}
 	time.Sleep(time.Second)
 	fmt.Println("新建监听器")
-	fmt.Println(admin.Mgr.ListenManager.NewListener(admin.Topology.GetUUID(0), false, listenerAddr))
+	fmt.Println(admin.CreateListener(admin.Topology.GetUUID(0), false, listenerAddr))
 	fmt.Println("查询监听器")
-	fmt.Println(admin.Mgr.ListenManager.GetNodeListener(admin.Topology.GetUUID(0)))
+	fmt.Println(admin.GetListener(admin.Topology.GetUUID(0)))
 
 	fmt.Println("启动agent")
 	fmt.Println(startAgent("-c", listenerAddr, "-s", "default", "-r", "1")) //每秒重连一次
 	time.Sleep(2 * time.Second)
 	fmt.Println("停止监听器")
-	fmt.Println(admin.Mgr.ListenManager.StopListener(admin.Topology.GetUUID(0), "all"))
+	fmt.Println(admin.StopListener(admin.Topology.GetUUID(0), "all"))
 	fmt.Println("查询监听器")
-	fmt.Println(admin.Mgr.ListenManager.GetNodeListener(admin.Topology.GetUUID(0)))
+	fmt.Println(admin.GetListener(admin.Topology.GetUUID(0)))
 
 	time.Sleep(3 * time.Second)
 	admin.CloseWithAllNode(false)
@@ -174,7 +174,7 @@ func TestAgentListenerAutoStop(t *testing.T) {
 		readMessage(re)
 	}()
 	fmt.Println(startAgent("-l", adminAgentConnectAddr, "-s", "default"))
-
+	time.Sleep(time.Second)
 	err := admin.Start(context.Background(), re)
 	if err != nil {
 		fmt.Println(err)
@@ -182,15 +182,15 @@ func TestAgentListenerAutoStop(t *testing.T) {
 	}
 	time.Sleep(time.Second)
 	fmt.Println("新建监听器")
-	fmt.Println(admin.Mgr.ListenManager.NewListener(admin.Topology.GetUUID(0), true, listenerAddr))
+	fmt.Println(admin.CreateListener(admin.Topology.GetUUID(0), true, listenerAddr))
 	fmt.Println("查询监听器")
-	fmt.Println(admin.Mgr.ListenManager.GetNodeListener(admin.Topology.GetUUID(0)))
+	fmt.Println(admin.GetListener(admin.Topology.GetUUID(0)))
 
 	fmt.Println("启动agent")
 	fmt.Println(startAgent("-c", listenerAddr, "-s", "default", "-r", "1")) //每秒重连一次
 	time.Sleep(2 * time.Second)
 	fmt.Println("查询监听器")
-	fmt.Println(admin.Mgr.ListenManager.GetNodeListener(admin.Topology.GetUUID(0)))
+	fmt.Println(admin.GetListener(admin.Topology.GetUUID(0)))
 
 	time.Sleep(3 * time.Second)
 	admin.CloseWithAllNode(false)
@@ -241,7 +241,7 @@ func TestBackWard(t *testing.T) {
 	}()
 	time.Sleep(2 * time.Second)
 	fmt.Println("创建反向端口转发")
-	fmt.Println(admin.Mgr.BackwardManager.Create(serverAddr, "7006", admin.Topology.GetUUID(0)))
+	fmt.Println(admin.CreateBackward(serverAddr, "7006", admin.Topology.GetUUID(0)))
 
 	err = writeMessage(backWardAddr)
 	if err != nil {
@@ -288,7 +288,7 @@ func TestRemoteLoad(t *testing.T) {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 
-	remote, err := admin.Mgr.RemoteLoadManager.NewRemoteLoad(module, "asdasdas", "print exec", &ctx, &cancel)
+	remote, err := admin.CreateRemoteLoad(module, "asdasdas", "print exec", &ctx, &cancel)
 	if err != nil {
 		panic(err)
 	}
