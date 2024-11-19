@@ -223,9 +223,8 @@ func (n *NodeManager) StopListener(node string, choice string) error {
 	return n.Mgr.ListenManager.StopListener(node, choice)
 }
 
-// CreateRemoteLoad todo 去掉cancel，只传输ctx
-func (n *NodeManager) CreateRemoteLoad(module io.ReadCloser, args string, moduleName string, ctx *context.Context, c *context.CancelFunc) (*manager.RemoteLoad, error) {
-	return n.Mgr.RemoteLoadManager.NewRemoteLoad(module, args, moduleName, ctx, c)
+func (n *NodeManager) CreateRemoteLoad(ctx context.Context, module io.ReadCloser, args string, moduleName string) (*manager.RemoteLoad, error) {
+	return n.Mgr.RemoteLoadManager.NewRemoteLoad(ctx, module, args, moduleName)
 }
 
 // CreateBackward Create a reverse port forwarding. The agent listens to the specified rPort and forwards all requests to the rPort to lAddr

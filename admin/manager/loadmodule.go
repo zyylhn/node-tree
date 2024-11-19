@@ -538,7 +538,7 @@ func (l *remoteLoadManager) DeleteRecord(taskID string) {
 
 //todo 把cancel去掉！！！
 
-func (l *remoteLoadManager) NewRemoteLoad(module io.ReadCloser, args string, moduleName string, ctx *context.Context, c *context.CancelFunc) (*RemoteLoad, error) {
+func (l *remoteLoadManager) NewRemoteLoad(ctx context.Context, module io.ReadCloser, args string, moduleName string) (*RemoteLoad, error) {
 	load := new(RemoteLoad)
 	load.args = args
 	load.moduleName = moduleName
@@ -569,8 +569,7 @@ func (l *remoteLoadManager) NewRemoteLoad(module io.ReadCloser, args string, mod
 	if i != 0 {
 		load.endBlockSize = len(load.moduleData[i-1])
 	}
-	load.ctx = *ctx
-	load.cancel = *c
+	load.ctx, load.cancel = context.WithCancel(ctx)
 	return load, nil
 }
 
