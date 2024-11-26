@@ -286,9 +286,7 @@ func TestRemoteLoad(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	ctx, cancel := context.WithCancel(context.Background())
-
-	remote, err := admin.CreateRemoteLoad(module, "asdasdas", "print exec", &ctx, &cancel)
+	remote, err := admin.CreateRemoteLoad(context.Background(), module, "asdasdas", "print exec")
 	if err != nil {
 		panic(err)
 	}

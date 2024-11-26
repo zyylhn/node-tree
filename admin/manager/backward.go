@@ -510,7 +510,7 @@ func (b *backwardManager) startBackWard(info *protocol.BackwardStart) {
 	if err != nil {
 		return
 	}
-
+	b.log.BackWardInfof("the backward[listen on admin %v agent(%v) %v(seq:%v)]connect to laddr success,local connection information:%v->%v ", info.LAddr, info.UUID, info.RPort, seq, backwardConn.LocalAddr(), backwardConn.RemoteAddr())
 	backwardTask = &BackwardTask{
 		Mode:  BWCheckBackWard,
 		RPort: info.RPort,
@@ -539,10 +539,8 @@ func (b *backwardManager) startBackWard(info *protocol.BackwardStart) {
 	dataChan := result.DataChan
 	transferChannel := bufferChannel.NewInfiniteChan(100)
 	go func() {
-		i := 0
 		for {
 			if data, ok := <-dataChan; ok {
-				i++
 				transferChannel.In <- data
 			} else {
 				transferChannel.Close()
@@ -551,10 +549,8 @@ func (b *backwardManager) startBackWard(info *protocol.BackwardStart) {
 		}
 	}()
 	go func() {
-		i := 0
 		for {
 			if data, ok := <-transferChannel.Out; ok {
-				i++
 				_, err = backwardConn.Write(data.([]byte))
 				b.log.BackWardDebugf("the backward[listen on admin %v agent(%v) %v(seq:%v)]get data from longChan and write to Admin local success \"%v\"", info.LAddr, info.UUID, info.RPort, seq, string(data.([]byte)))
 				if err != nil {
@@ -581,7 +577,7 @@ func (b *backwardManager) startBackWard(info *protocol.BackwardStart) {
 	for {
 		length, err := backwardConn.Read(buffer)
 		if err != nil {
-			b.log.BackWardInfof("the backward(listen on admin %v agent(%v) %v(seq:%v))initial closed(admin active close)", info.LAddr, info.UUID, info.RPort, seq)
+			b.log.BackWardInfof("the backward(listen on admin %v agent(%v) %v(seq:%v)read from connection(%v->%v) error: %v)", info.LAddr, info.UUID, info.RPort, seq, backwardConn.LocalAddr(), backwardConn.RemoteAddr(), err)
 			_ = backwardConn.Close()
 			return
 		}
