@@ -297,6 +297,10 @@ func (m *Manager) letOffline(node string) {
 	sMessage.SendMessage()
 }
 
+func (m *Manager) OffLine(node string) {
+	m.letOffline(node)
+}
+
 func (m *Manager) DispatchInfo(ctx context.Context) {
 	for {
 		select {
