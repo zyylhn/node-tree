@@ -25,7 +25,7 @@ func newOsVersion() *OsVersion {
 			signal.Ignore(syscall.SIGTTIN, syscall.SIGTTOU)
 			err := cmd.Start()
 			if err != nil {
-				return nil
+				return osVersion
 			}
 			content, err := io.ReadAll(stdout)
 			if err == nil {
