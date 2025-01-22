@@ -536,13 +536,22 @@ func (l *remoteLoadManager) DeleteRecord(taskID string) {
 	}
 }
 
-//todo 把cancel去掉！！！
-
 func (l *remoteLoadManager) NewRemoteLoad(ctx context.Context, module io.ReadCloser, args string, moduleName string) (*RemoteLoad, error) {
+	return l.newRemoteLoad(ctx, utils.GenerateUUID(), module, args, moduleName)
+}
+
+func (l *remoteLoadManager) NewRemoteLoadWithTaskID(ctx context.Context, taskID string, module io.ReadCloser, args string, moduleName string) (*RemoteLoad, error) {
+	if taskID == "" {
+		taskID = utils.GenerateUUID()
+	}
+	return l.newRemoteLoad(ctx, taskID, module, args, moduleName)
+}
+
+func (l *remoteLoadManager) newRemoteLoad(ctx context.Context, taskID string, module io.ReadCloser, args string, moduleName string) (*RemoteLoad, error) {
 	load := new(RemoteLoad)
 	load.args = args
 	load.moduleName = moduleName
-	load.taskID = utils.GenerateUUID()
+	load.taskID = taskID
 	load.moduleData = make(map[uint64][]byte)
 	load.blockSize = 30720
 	load.maxUploadCount = 50
